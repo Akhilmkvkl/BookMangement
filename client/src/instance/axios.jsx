@@ -4,6 +4,6 @@ export const axiosUserInstance = axios.create({
     baseURL: "http://localhost:4000/users"
 })
 
-export const axiosExpertInstance = axios.create({
+export const axiosAdminInstance = axios.create({
     baseURL: "http://localhost:4000/admin"
 })

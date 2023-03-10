@@ -1,42 +1,8 @@
 import { useEffect, useState } from "react";
 import { axiosUserInstance } from "../../instance/axios";
-
-// const bookList = [
-//   {
-//     id: 1,
-//     title: "The Great Gatsby",
-//     author: "F. Scott Fitzgerald",
-//     genre: "Classic",
-//     imageUrl: "https://m.media-amazon.com/images/I/51n-q69gn4L.jpg",
-//   },
-//   {
-//     id: 2,
-//     title: "To Kill a Mockingbird",
-//     author: "Harper Lee",
-//     genre: "Classic",
-//     imageUrl: "https://m.media-amazon.com/images/I/51-nXsSRfZL.jpg",
-//   },
-//   {
-//     id: 3,
-//     title: "The Hobbit",
-//     author: "J.R.R. Tolkien",
-//     genre: "Fantasy",
-//     imageUrl:
-//       "https://m.media-amazon.com/images/P/B0BWYWQ1XF.01._SCLZZZZZZZ_SX500_.jpg",
-//   },
-//   {
-//     id: 4,
-//     title: "The Catcher in the Rye",
-//     author: "J.D. Salinger",
-//     genre: "Classic",
-//     imageUrl:
-//       "https://m.media-amazon.com/images/I/51n4BlaMF-L._SY344_BO1,204,203,200_.jpg",
-//   },
-// ];
+import { useNavigate } from "react-router-dom";
 
 function BookCard({ book }) {
-  
-
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-lg ">
       <div className="relative" style={{ padding: "20px 20px 0" }}>
@@ -57,31 +23,32 @@ function BookCard({ book }) {
 }
 
 function Book() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("All");
-  const [bookList,setBookList]=useState([])
+  const [bookList, setBookList] = useState([]);
 
-    const getdata=async()=>{
-        try {
-            const res= await axiosUserInstance.get('/getbooks')
-            if(res){
-                console.log(res)
-                setBookList(res.data.books)
-
-            }
-
-        } catch (error) {
-             console.log(error)
-        }
+  const getdata = async () => {
+    try {
+      const res = await axiosUserInstance.get("/getbooks");
+      if (res) {
+        console.log(res);
+        setBookList(res.data.Books);
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    useEffect(()=>{
-        try {
-            getdata()
-        } catch (error) {
-            
-        }
-    })
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/");
+      }
+      getdata();
+    } catch (error) {}
+  }, []);
 
   const filteredBooks = bookList.filter(
     (book) =>

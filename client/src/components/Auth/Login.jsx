@@ -1,12 +1,24 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { axiosUserInstance } from "../../instance/axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Login() {
-    const navigate=useNavigate()
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        navigate("/home");
+      }
+    } catch (error) {}
+  });
 
   const handleusername = (e) => {
     setUsername(e.target.value);
@@ -18,13 +30,12 @@ function Login() {
     setErrors({});
   };
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     try {
       event.preventDefault();
 
       if (!username.trim()) {
         setErrors(() => ({
-          
           username: "Username is required",
         }));
         return;
@@ -32,21 +43,48 @@ function Login() {
 
       if (!password.trim()) {
         setErrors(() => ({
-          
           password: "Password is required",
         }));
         return;
       }
-
       console.log(username, password);
-       navigate('/home')
+      const res = await axiosUserInstance.post("/login", {
+        username,
+        password,
+      });
 
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        navigate("/home");
+      } else {
+        toast.error("invalid username/password", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      }
     } catch (error) {
-      return error;
+      console.log(error);
+      toast.error(error.response.data.msg, {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     }
   }
   return (
     <div className="flex h-screen bg-gray-200">
+      <ToastContainer />
       <div className="m-auto w-full max-w-sm">
         <div className="text-center text-2xl font-medium text-gray-900">
           Login
